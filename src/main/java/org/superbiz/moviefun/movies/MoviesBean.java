@@ -16,6 +16,8 @@
  */
 package org.superbiz.moviefun.movies;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,8 @@ import java.util.List;
 @Repository
 public class MoviesBean {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -38,8 +42,10 @@ public class MoviesBean {
 
     @Transactional
     public void addMovie(Movie movie) {
-        System.err.println("Creating movie with title " + movie.getTitle() +
-            ", and year " + movie.getYear());
+//        System.err.println("Creating movie with title " + movie.getTitle() +
+//            ", and year " + movie.getYear());
+        logger.debug("Creating movie with title " , movie.getTitle() ,
+                ", and year " , movie.getYear());
 
         entityManager.persist(movie);
     }
@@ -63,6 +69,7 @@ public class MoviesBean {
     public List<Movie> getMovies() {
         CriteriaQuery<Movie> cq = entityManager.getCriteriaBuilder().createQuery(Movie.class);
         cq.select(cq.from(Movie.class));
+        logger.info("Accessing getMovies");
         return entityManager.createQuery(cq).getResultList();
     }
 
@@ -72,6 +79,7 @@ public class MoviesBean {
         TypedQuery<Movie> q = entityManager.createQuery(cq);
         q.setMaxResults(maxResults);
         q.setFirstResult(firstResult);
+        logger.info("Accessing findAll");
         return q.getResultList();
     }
 
@@ -80,6 +88,7 @@ public class MoviesBean {
         Root<Movie> rt = cq.from(Movie.class);
         cq.select(entityManager.getCriteriaBuilder().count(rt));
         TypedQuery<Long> q = entityManager.createQuery(cq);
+        logger.info("Accessing countAll");
         return (q.getSingleResult()).intValue();
     }
 
